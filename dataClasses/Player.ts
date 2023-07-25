@@ -30,6 +30,7 @@ export default class Player {
     /**List of {@link Building | Buildings} owned by player. */
     readonly buildings: Building[] = [];
 
+    /**List of {@link Building | Buildings} owned by player. */
     readonly commodities: Commodity[] = [];
 
     /**Data known to player about his opponents. */
