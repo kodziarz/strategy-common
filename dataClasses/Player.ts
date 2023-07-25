@@ -2,6 +2,7 @@ import Building from "./Building";
 import MapField from "./MapField";
 import Opponent from "./Opponent";
 import User from "../../strategy-server/src/dataClasses/User";
+import Commodity from "./Commodity";
 
 /**
  * Stores player's game-connected data.
@@ -29,6 +30,8 @@ export default class Player {
     /**List of {@link Building | Buildings} owned by player. */
     readonly buildings: Building[] = [];
 
+    readonly commodities: Commodity[] = [];
+
     /**Data known to player about his opponents. */
     readonly opponents: Opponent[] = [];
 
@@ -48,10 +51,11 @@ export default class Player {
         this.rows = rows;
     }
 
-    getOpponentById(userId: number): Opponent {
+    getOpponentById(userId: number): Opponent | null {
         for (const opponent of this.opponents) {
             if (opponent.userId == userId)
                 return opponent;
         }
+        return null;
     }
 }
