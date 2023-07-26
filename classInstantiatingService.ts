@@ -1,5 +1,6 @@
 import Building from "./dataClasses/Building";
 import MapField from "./dataClasses/MapField";
+import Opponent from "./dataClasses/Opponent";
 import BuildingsTypes from "./dataClasses/buildings/BuildingsTypes";
 import MainBuilding from "./dataClasses/buildings/MainBuilding";
 import FieldsTypes from "./dataClasses/mapFields/FieldsTypes";
@@ -39,4 +40,11 @@ export const instantiateMapField = (mapFieldData: MapField): MapField => {
             break;
         default: throw new Error("Such MapField type as " + mapFieldData.type + " does not exist.");
     }
+};
+
+
+export const instantiateOpponent = (opponentData: Opponent): Opponent => {
+    let opponent = new Opponent(opponentData.userId);
+    opponent.buildings = opponentData.buildings.map((building) => { return instantiateBuilding(building); });
+    return opponent;
 };
