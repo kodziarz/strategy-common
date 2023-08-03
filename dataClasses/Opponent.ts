@@ -1,6 +1,6 @@
 import Building from "./Building";
 
-/**Stroes data which is known to specific {@link Player} about his opponent. */
+/**Stores data which is known to specific {@link Player} about his opponent. */
 export default class Opponent {
 
 

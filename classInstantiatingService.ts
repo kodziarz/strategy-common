@@ -16,7 +16,7 @@ import Grassland from "./dataClasses/mapFields/Grassland";
 export const instantiateBuilding = (buildingData: Building): Building => {
     switch (buildingData.type) {
         case BuildingsTypes.MAIN:
-            return Object.assign(new MainBuilding(-1, -1), buildingData);
+            return Object.assign(new MainBuilding(-1, -1, buildingData.ownerId), buildingData);
             break;
         // Rest of types of Building to write here
         /*

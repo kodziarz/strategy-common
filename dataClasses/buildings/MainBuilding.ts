@@ -7,8 +7,9 @@ export default class MainBuilding extends Building {
 
     constructor(
         public x: number,
-        public y: number
+        public y: number,
+        ownerId: number
     ) {
-        super();
+        super(ownerId);
     }
 }

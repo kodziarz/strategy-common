@@ -11,10 +11,12 @@ export default abstract class Building {
     readonly width: number = 10;
     readonly length: number = 10;
     readonly id: string;
+    readonly ownerId: number;
     readonly occupiedFields: MapField[] = [];
 
-    constructor() {
+    constructor(ownerId: number) {
         this.id = uuid();
+        this.ownerId = ownerId;
     }
 
     /**
