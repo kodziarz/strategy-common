@@ -22,7 +22,7 @@ export default abstract class Building {
      * place, but without other information.
      * @returns New object with indentification data.
      */
-    getIdentifier = () => {
+    getIdentifier() {
         return {
             id: this.id
         };
@@ -33,7 +33,7 @@ export default abstract class Building {
      * further circular dependencies.
      * @returns Copy of the object without circular depencies.
      */
-    getSimplified = () => {
+    getSimplified() {
         let tmp: any = { ...this };
         tmp.occupiedFields = this.occupiedFields.map((mapField) => { return mapField.getIndentifier(); });
         return tmp;

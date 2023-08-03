@@ -34,7 +34,7 @@ export default abstract class MapField {
      * place, but without other information.
      * @returns New object with indentification data.
      */
-    getIndentifier = () => {
+    getIndentifier() {
         return {
             column: this.column,
             row: this.row
@@ -46,7 +46,7 @@ export default abstract class MapField {
      * further circular dependencies.
      * @returns Copy of the object without circular depencies.
      */
-    getSimplified = () => {
+    getSimplified() {
         let tmp: any = { ...this };
         tmp.buildings = this.buildings.map((building) => { return building.getIdentifier(); });
         return tmp;

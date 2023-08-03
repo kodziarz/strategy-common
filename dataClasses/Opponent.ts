@@ -13,7 +13,7 @@ export default class Opponent {
      * place, but without other information.
      * @returns New object with indentification data.
      */
-    getIndentifier = () => {
+    getIndentifier() {
         return {
             userId: this.userId
         };
@@ -24,7 +24,7 @@ export default class Opponent {
      * further circular dependencies.
      * @returns Copy of the object without circular depencies.
      */
-    getSimplified = () => {
+    getSimplified() {
         let tmp: any = { ...this };
         tmp.buildings = this.buildings.map((building) => { return building.getSimplified(); });
         return tmp;

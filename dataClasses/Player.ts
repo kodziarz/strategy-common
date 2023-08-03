@@ -60,7 +60,7 @@ export default class Player {
         return null;
     }
 
-    toJSON = () => {
+    toJSON() {
         let tmp: any = { ...this };
         tmp.observedMapFields = this.observedMapFields.map((mapField) => { return mapField.getSimplified(); });
         // tmp.visitedMapFields is not needed, because there are stored deep copies
