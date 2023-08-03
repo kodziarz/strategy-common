@@ -29,11 +29,10 @@ export default abstract class Building {
     };
 
     /**
-     * Creates object, which does contain such elements as buildings, but without
-     * further circular dependencies.
+     * Creates object with identifiers as references to other objects.
      * @returns Copy of the object without circular depencies.
      */
-    getSimplified() {
+    getWithIdentifiers() {
         let tmp: any = { ...this };
         tmp.occupiedFields = this.occupiedFields.map((mapField) => { return mapField.getIndentifier(); });
         return tmp;

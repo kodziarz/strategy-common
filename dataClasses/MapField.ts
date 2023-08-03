@@ -12,9 +12,9 @@ export default abstract class MapField {
     /**Integer indicating which in a row is this {@link MapField} vertically */
     readonly row: number;
     /**Accurate X coordinate of {@link MapField | MapField's} center.*/
-    readonly x: number;
+    readonly centerX: number;
     /**Accurate Y coordinate of {@link MapField | MapField's} center.*/
-    readonly y: number;
+    readonly centerY: number;
     /**Buildings placed on {@link MapField}. */
     readonly buildings: Building[] = [];
 
@@ -25,8 +25,8 @@ export default abstract class MapField {
         this.column = column;
         this.row = row;
 
-        this.x = (this.column + 0.5) * SETTINGS.mapFieldSide;
-        this.y = (this.row + 0.5) * SETTINGS.mapFieldSide;
+        this.centerX = (this.column + 0.5) * SETTINGS.mapFieldSide;
+        this.centerY = (this.row + 0.5) * SETTINGS.mapFieldSide;
     }
 
     /**
@@ -42,13 +42,24 @@ export default abstract class MapField {
     };
 
     /**
-     * Creates object, which does contain such elements as buildings, but without
-     * further circular dependencies.
+     * Creates object with identifiers as references to other objects.
      * @returns Copy of the object without circular depencies.
      */
-    getSimplified() {
+    getWithIdentifiers() {
         let tmp: any = { ...this };
         tmp.buildings = this.buildings.map((building) => { return building.getIdentifier(); });
         return tmp;
     };
+
+    /**
+     * Creates object with data of referenced objects, but these have identifiers.
+     * (The returned object's descendants are generated with
+     * {@link getWithIdentifiers} method.)
+     * @returns Copy of the object without circular depencies.
+     */
+    getSimplified() {
+        let tmp: any = { ...this };
+        tmp.buildings = this.buildings.map((building) => { return building.getWithIdentifiers(); });
+        return tmp;
+    }
 }

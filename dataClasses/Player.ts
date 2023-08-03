@@ -1,7 +1,6 @@
 import Building from "./Building";
 import MapField from "./MapField";
 import Opponent from "./Opponent";
-import User from "../../strategy-server/src/dataClasses/User";
 import Commodity from "./Commodity";
 
 /**
@@ -62,9 +61,9 @@ export default class Player {
 
     toJSON() {
         let tmp: any = { ...this };
-        tmp.observedMapFields = this.observedMapFields.map((mapField) => { return mapField.getSimplified(); });
+        tmp.observedMapFields = this.observedMapFields.map((mapField) => { return mapField.getWithIdentifiers(); });
         // tmp.visitedMapFields is not needed, because there are stored deep copies
-        tmp.buildings = this.buildings.map((building) => { return building.getSimplified(); });
+        tmp.buildings = this.buildings.map((building) => { return building.getWithIdentifiers(); });
         tmp.opponents = this.opponents.map((opponent) => { return opponent.getSimplified(); });
         return tmp;
     };

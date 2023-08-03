@@ -9,8 +9,7 @@ export default class Opponent {
     constructor(readonly userId: number) { }
 
     /**
-     * Creates object which enables to identify which object should be on the
-     * place, but without other information.
+     * Creates object which enables to identify actual object.
      * @returns New object with indentification data.
      */
     getIndentifier() {
@@ -20,13 +19,14 @@ export default class Opponent {
     };
 
     /**
-     * Creates object, which does contain such elements as buildings, but without
-     * further circular dependencies.
+     * Creates object with data of referenced objects, but these have identifiers.
+     * (The returned object's descendants are generated with
+     * {@link getWithIdentifiers} method.)
      * @returns Copy of the object without circular depencies.
      */
     getSimplified() {
         let tmp: any = { ...this };
-        tmp.buildings = this.buildings.map((building) => { return building.getSimplified(); });
+        tmp.buildings = this.buildings.map((building) => { return building.getWithIdentifiers(); });
         return tmp;
     };
 }
