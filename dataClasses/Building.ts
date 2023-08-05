@@ -1,6 +1,9 @@
 import MapField from "./MapField";
 import BuildingsTypes from "./buildings/BuildingsTypes";
 import { v4 as uuid } from "uuid";
+import BuildingIdentifier from "./../socketioMessagesClasses/BuildingIdentifier";
+import BuildingWithIdentifiers from "./../socketioMessagesClasses/BuildingWithIdentifiers";
+import MapFieldIdentifier from "./../socketioMessagesClasses/MapFieldIdentifier";
 
 /**Class to extend to create specific buildings */
 export default abstract class Building {
@@ -27,7 +30,7 @@ export default abstract class Building {
     getIdentifier() {
         return {
             id: this.id
-        };
+        } as BuildingIdentifier;
     };
 
     /**
@@ -35,8 +38,8 @@ export default abstract class Building {
      * @returns Copy of the object without circular depencies.
      */
     getWithIdentifiers() {
-        let tmp: any = { ...this };
-        tmp.occupiedFields = this.occupiedFields.map((mapField) => { return mapField.getIndentifier(); });
+        let tmp: BuildingWithIdentifiers = { ...this };
+        tmp.occupiedFields = this.occupiedFields.map((mapField) => { return mapField.getIndentifier(); }) as MapFieldIdentifier[];
         return tmp;
     };
 }

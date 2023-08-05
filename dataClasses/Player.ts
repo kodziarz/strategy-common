@@ -2,6 +2,7 @@ import Building from "./Building";
 import MapField from "./MapField";
 import Opponent from "./Opponent";
 import Commodity from "./Commodity";
+import SimplifiedPlayer from "../socketioMessagesClasses/SimplifiedPlayer";
 
 /**
  * Stores player's game-connected data.
@@ -60,11 +61,12 @@ export default class Player {
     }
 
     toJSON() {
-        let tmp: any = { ...this };
-        tmp.observedMapFields = this.observedMapFields.map((mapField) => { return mapField.getWithIdentifiers(); });
-        // tmp.visitedMapFields is not needed, because there are stored deep copies
-        tmp.buildings = this.buildings.map((building) => { return building.getWithIdentifiers(); });
-        tmp.opponents = this.opponents.map((opponent) => { return opponent.getSimplified(); });
-        return tmp;
+        let copy: SimplifiedPlayer = { ...this };
+        copy.observedMapFields = this.observedMapFields.map((mapField) => { return mapField.getWithIdentifiers(); });
+        // notice: there are stored deep copies in visitedMapFields
+        copy.visitedMapFields = this.visitedMapFields.map((mapField) => { return mapField.getWithIdentifiers(); });
+        copy.buildings = this.buildings.map((building) => { return building.getWithIdentifiers(); });
+        copy.opponents = this.opponents.map((opponent) => { return opponent.getSimplified(); });
+        return copy;
     };
 }

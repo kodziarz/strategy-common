@@ -1,6 +1,9 @@
 import SETTINGS from "../SETTINGS";
 import Building from "./Building";
 import FieldsTypes from "./mapFields/FieldsTypes";
+import MapFieldIdentifier from "./../socketioMessagesClasses/MapFieldIdentifier";
+import MapFieldWithIdentifiers from "./../socketioMessagesClasses/MapFieldWithIdentifiers";
+import BuildingIdentifier from "./../socketioMessagesClasses/BuildingIdentifier";
 
 /**Class to extend to create MapFields containing something etc. */
 export default abstract class MapField {
@@ -38,7 +41,7 @@ export default abstract class MapField {
         return {
             column: this.column,
             row: this.row
-        };
+        } as MapFieldIdentifier;
     };
 
     /**
@@ -46,20 +49,20 @@ export default abstract class MapField {
      * @returns Copy of the object without circular depencies.
      */
     getWithIdentifiers() {
-        let tmp: any = { ...this };
-        tmp.buildings = this.buildings.map((building) => { return building.getIdentifier(); });
-        return tmp;
+        let copy: MapFieldWithIdentifiers = { ...this };
+        copy.buildings = this.buildings.map((building) => { return building.getIdentifier(); }) as BuildingIdentifier[];
+        return copy;
     };
 
-    /**
-     * Creates object with data of referenced objects, but these have identifiers.
-     * (The returned object's descendants are generated with
-     * {@link getWithIdentifiers} method.)
-     * @returns Copy of the object without circular depencies.
-     */
-    getSimplified() {
-        let tmp: any = { ...this };
-        tmp.buildings = this.buildings.map((building) => { return building.getWithIdentifiers(); });
-        return tmp;
-    }
+    // /**
+    //  * Creates object with data of referenced objects, but these have identifiers.
+    //  * (The returned object's descendants are generated with
+    //  * {@link getWithIdentifiers} method.)
+    //  * @returns Copy of the object without circular depencies.
+    //  */
+    // getSimplified() {
+    //     let tmp: any = { ...this };
+    //     tmp.buildings = this.buildings.map((building) => { return building.getWithIdentifiers(); });
+    //     return tmp;
+    // }
 }
