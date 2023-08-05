@@ -7,6 +7,9 @@ import FieldsTypes from "./dataClasses/mapFields/FieldsTypes";
 import Grassland from "./dataClasses/mapFields/Grassland";
 import BuildingWithIdentifiers from "./socketioMessagesClasses/BuildingWithIdentifiers";
 import MapFieldWithIdentifiers from "./socketioMessagesClasses/MapFieldWithIdentifiers";
+import Unit from "./dataClasses/Unit";
+import UnitTypes from "./dataClasses/units/UnitTypes";
+import Builder from "./dataClasses/units/Builder";
 
 /**
      * Converts raw {@link Building | Building's} data to instance of specific
@@ -73,6 +76,15 @@ export const fillMapField = (mapFieldData: MapField, allBuildings: Building[]) =
             throw new Error("Such a building with id " + buildingData.id + " does not exist.");
         else array[i] = foundBuilding;
     });
+};
+
+export const instantiateUnit = (unitData: Unit) => {
+    switch (unitData.type) {
+        case UnitTypes.BUILDER:
+            return Object.assign(new Builder(-1), unitData);
+            break;
+        default: throw new Error("Such MapField type as " + unitData.type + " does not exist.");
+    }
 };
 
 /**

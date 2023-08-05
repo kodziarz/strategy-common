@@ -2,6 +2,7 @@ import Building from "./Building";
 import MapField from "./MapField";
 import Opponent from "./Opponent";
 import Commodity from "./Commodity";
+import Unit from "./Unit";
 import SimplifiedPlayer from "../socketioMessagesClasses/SimplifiedPlayer";
 
 /**
@@ -12,14 +13,14 @@ export default class Player {
 
     readonly userId: number;
     /**
-     * List of {@link MapField | MapFields} on which changes are instantly
+     * List of {@link MapField}s on which changes are instantly
      * sent to client.
      */
     readonly observedMapFields: MapField[] = [];
     /**
-     * List of {@link MapField | MapFields} which were only visited and their state is not
+     * List of {@link MapField}s which were only visited and their state is not
      * instantly sent to client.
-     * Stored {@link MapField | MapFields} are copies of fields from
+     * Stored {@link MapField}s are copies of fields from
      * {@link Map} created at the last moment the {@link MapField} was
      * observed.
      * List is sent after the {@link Player} joined game in case it is a
@@ -27,19 +28,22 @@ export default class Player {
      */
     readonly visitedMapFields: MapField[] = [];
 
-    /**List of {@link Building | Buildings} owned by player. */
+    /**List of {@link Building}s owned by player. */
     readonly buildings: Building[] = [];
 
-    /**List of {@link Building | Buildings} owned by player. */
+    /**List of {@link Commodity}s owned by player. */
     readonly commodities: Commodity[] = [];
+
+    /**List of {@link Unit}s owned by the player.  */
+    readonly units: Unit[] = [];
 
     /**Data known to player about his opponents. */
     readonly opponents: Opponent[] = [];
 
-    /**Game map width (in {@link MapField | MapFields}). */
+    /**Game map width (in {@link MapField}s). */
     readonly columns: number;
 
-    /**Game map height (in {@link MapField | MapFields}). */
+    /**Game map height (in {@link MapField}s). */
     readonly rows: number;
 
     constructor(
