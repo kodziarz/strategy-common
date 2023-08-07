@@ -10,6 +10,7 @@ import MapFieldWithIdentifiers from "./socketioMessagesClasses/MapFieldWithIdent
 import Unit from "./dataClasses/Unit";
 import UnitTypes from "./dataClasses/units/UnitTypes";
 import Builder from "./dataClasses/units/Builder";
+import UnitWithIdentifiers from "./socketioMessagesClasses/UnitWithIdentifiers";
 
 /**
      * Converts raw {@link Building | Building's} data to instance of specific
@@ -69,16 +70,22 @@ export const instantiateMapField = (mapFieldData: MapFieldWithIdentifiers): MapF
  * @param mapFieldData Filled field.
  * @param allBuildings Array of all buildings, to fill data sructure.
  */
-export const fillMapField = (mapFieldData: MapField, allBuildings: Building[]) => {
+export const fillMapField = (mapFieldData: MapField, allBuildings: Building[], allUnits: Unit[]) => {
     mapFieldData.buildings.forEach((buildingData, i, array) => {
         let foundBuilding = allBuildings.find((checkedBuilding) => { return checkedBuilding.id == buildingData.id; });
         if (!foundBuilding)
             throw new Error("Such a building with id " + buildingData.id + " does not exist.");
         else array[i] = foundBuilding;
     });
+    mapFieldData.units.forEach((unitData, i, array) => {
+        let foundUnit = allUnits.find((checkedUnit) => { return checkedUnit.id == unitData.id; });
+        if (!foundUnit)
+            throw new Error("Such a unit with id " + unitData.id + " does not exist.");
+        else array[i] = foundUnit;
+    });
 };
 
-export const instantiateUnit = (unitData: Unit) => {
+export const instantiateUnit = (unitData: UnitWithIdentifiers): Unit => {
     switch (unitData.type) {
         case UnitTypes.BUILDER:
             return Object.assign(new Builder(-1), unitData);

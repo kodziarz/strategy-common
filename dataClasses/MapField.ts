@@ -4,6 +4,8 @@ import FieldsTypes from "./mapFields/FieldsTypes";
 import MapFieldIdentifier from "./../socketioMessagesClasses/MapFieldIdentifier";
 import MapFieldWithIdentifiers from "./../socketioMessagesClasses/MapFieldWithIdentifiers";
 import BuildingIdentifier from "./../socketioMessagesClasses/BuildingIdentifier";
+import Unit from "./Unit";
+import UnitIdentifier from "../socketioMessagesClasses/UnitIdentifier";
 
 /**Class to extend to create MapFields containing something etc. */
 export default abstract class MapField {
@@ -20,6 +22,8 @@ export default abstract class MapField {
     readonly centerY: number;
     /**Buildings placed on {@link MapField}. */
     readonly buildings: Building[] = [];
+    /**Units standing on {@link MapField}. */
+    readonly units: Unit[] = [];
 
     constructor(
         column: number,
@@ -51,6 +55,7 @@ export default abstract class MapField {
     getWithIdentifiers() {
         let copy: MapFieldWithIdentifiers = { ...this };
         copy.buildings = this.buildings.map((building) => { return building.getIdentifier(); }) as BuildingIdentifier[];
+        copy.units = this.units.map((unit) => { return unit.getIdentifier(); }) as UnitIdentifier[];
         return copy;
     };
 

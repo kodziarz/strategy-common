@@ -1,5 +1,6 @@
 import FieldsTypes from "../dataClasses/mapFields/FieldsTypes";
 import BuildingIdentifier from "./BuildingIdentifier";
+import UnitIdentifier from "./UnitIdentifier";
 
 export default interface MapFieldWithIdentifiers {
     type: FieldsTypes;
@@ -8,4 +9,5 @@ export default interface MapFieldWithIdentifiers {
     centerX: number;
     centerY: number;
     buildings: BuildingIdentifier[];
+    units: UnitIdentifier[];
 }
