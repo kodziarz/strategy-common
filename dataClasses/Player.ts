@@ -70,6 +70,7 @@ export default class Player {
         // notice: there are stored deep copies in visitedMapFields
         copy.visitedMapFields = this.visitedMapFields.map((mapField) => { return mapField.getWithIdentifiers(); });
         copy.buildings = this.buildings.map((building) => { return building.getWithIdentifiers(); });
+        copy.units = this.units.map((unit) => { return unit.getWithIdentifiers(); });
         copy.opponents = this.opponents.map((opponent) => { return opponent.getSimplified(); });
         return copy;
     };

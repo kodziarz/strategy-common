@@ -11,8 +11,8 @@ export default abstract class Building {
     type: BuildingsTypes;
     x: number;
     y: number;
-    readonly width: number = 10;
-    readonly length: number = 10;
+    readonly width: number = 5;
+    readonly length: number = 5;
     readonly id: string;
     readonly ownerId: number;
     readonly occupiedFields: MapField[] = [];

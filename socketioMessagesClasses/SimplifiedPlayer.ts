@@ -1,7 +1,7 @@
-import Unit from "../dataClasses/Unit";
 import BuildingWithIdentifiers from "./BuildingWithIdentifiers";
 import MapFieldWithIdentifiers from "./MapFieldWithIdentifiers";
 import SimplifiedOpponent from "./SimplifiedOpponent";
+import UnitWithIdentifiers from "./UnitWithIdentifiers";
 
 export default interface SimplifiedPlayer {
     userId: number;
@@ -9,7 +9,7 @@ export default interface SimplifiedPlayer {
     visitedMapFields: MapFieldWithIdentifiers[];
     buildings: BuildingWithIdentifiers[];
     // commodities: Commodity[];
-    units: Unit[];
+    units: UnitWithIdentifiers[];
     opponents: SimplifiedOpponent[];
     columns: number;
     rows: number;
