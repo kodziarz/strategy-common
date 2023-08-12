@@ -27,6 +27,12 @@ export default abstract class Unit {
     }
 
     /**
+     * Gets the velocity of given unit on specific {@link MapField}.
+     * @param mapField Field, on which the {@link Unit}'s velocity is dependent.
+     */
+    abstract getVelocityOnMapField(mapField: MapField): number;
+
+    /**
      * Creates object which enables to identify which object should be on the
      * place, but without further information.
      * @returns New object with indentification data.
