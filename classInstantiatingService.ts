@@ -11,6 +11,8 @@ import Unit from "./dataClasses/Unit";
 import UnitTypes from "./dataClasses/units/UnitTypes";
 import Builder from "./dataClasses/units/Builder";
 import UnitWithIdentifiers from "./socketioMessagesClasses/UnitWithIdentifiers";
+import UnitIdentifier from "./socketioMessagesClasses/UnitIdentifier";
+import Point2d from "./geometryClasses/Point2d";
 
 /**
      * Converts raw {@link Building | Building's} data to instance of specific
@@ -110,4 +112,23 @@ export const instantiateOpponent = (opponentData: Opponent, allBuildings: Buildi
         else throw new Error("The building (id: " + buildingIdentifier.id + ") the server send does not exist on client.");
     });
     return Object.assign(new Opponent(opponentData.userId), opponentData);
+};
+
+/**
+ * Finds actual user object by its identifier.
+ * @param identifier Unit identifier.
+ * @param unitsList List with all units to find actual unit by identifier.
+ * @returns Actual unit or undefined if not found.
+ */
+export const findUnit = (identifier: UnitIdentifier, unitsList: Unit[]) => {
+    return unitsList.find((checkedUnit) => { return checkedUnit.id == identifier.id; });
+};
+
+/**
+ * Instantiates raw {@link Point2d} json data.
+ * @param pointData Raw json data of {@link Point2d}.
+ * @returns Instantiated point with given data.
+ */
+export const instantiatePoint = (pointData: Point2d): Point2d => {
+    return Object.assign(new Point2d(0, 0), pointData);
 };
