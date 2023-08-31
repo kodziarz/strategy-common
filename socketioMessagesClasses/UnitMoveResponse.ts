@@ -1,5 +1,7 @@
 import UnitIdentifier from "./UnitIdentifier";
 export default interface UnitMoveResponse {
+    /**Unix time of start. */
     start: number;
-    unit: UnitIdentifier;
+    /**Id of {@link Movement}. */
+    id: string;
 }

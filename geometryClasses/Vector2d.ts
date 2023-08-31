@@ -10,7 +10,7 @@ export default class Vector2d {
     }
 
     getLength() {
-        return Math.sqrt(this.x * this.x + this.y + this.y);
+        return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
     normalize() {
@@ -22,7 +22,7 @@ export default class Vector2d {
 
     multiply(scalar: number) {
         this.x *= scalar;
-        this.y += scalar;
+        this.y *= scalar;
         return this;
     }
 

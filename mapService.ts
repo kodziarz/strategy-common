@@ -1,7 +1,10 @@
 import SETTINGS from "./SETTINGS";
 import MapField from "./dataClasses/MapField";
+import Unit from "./dataClasses/Unit";
 import Point2d from "./geometryClasses/Point2d";
-
+import Movement from "./geometryClasses/Movement";
+import Vector2d from "./geometryClasses/Vector2d";
+import Building from "./dataClasses/Building";
 /**
  * Gets {@link MapField}, on which the position is located.
  * @param x X coordinate of position.
@@ -9,10 +12,61 @@ import Point2d from "./geometryClasses/Point2d";
  * @param fieldsMap Two-dimenional array of {@link MapField}s.
  * @returns Field, to which the position belongs.
  */
-export const getMapFieldOfPosition = (x: number, y: number, fieldsMap: MapField[][]): MapField => {
-    const column = Math.floor(x / SETTINGS.mapFieldSide);
-    const row = Math.floor(y / SETTINGS.mapFieldSide);
+export const getMapFieldOfPoint = <T>(x: number, y: number, fieldsMap: T[][]): T => {
+    const { column, row } = getMapPositionOfPoint(x, y);
     return fieldsMap[column][row];
+};
+
+/**
+ * Gets map position of point i.e. column and row of {@link MapField} the
+ * point is located on.
+ * @param x X coordinate of point.
+ * @param y Y coordinate of point.
+ * @returns Map position of point.
+ */
+export const getMapPositionOfPoint = (x: number, y: number): MapPosition => {
+    return {
+        column: Math.floor(x / SETTINGS.mapFieldSide),
+        row: Math.floor(y / SETTINGS.mapFieldSide)
+    };
+};
+
+export const getMapFieldsOfBuilding = <T>(building: Building, fieldsMap: T[][]): T[] => {
+    const widthHalf = building.width / 2;
+    const lengthHalf = building.length / 2;
+
+    let result: T[] = [];
+    result.push(getMapFieldOfPoint(building.x - widthHalf, building.y + lengthHalf, fieldsMap));
+
+    let field = getMapFieldOfPoint(building.x - widthHalf, building.y - lengthHalf, fieldsMap);
+    if (!result.includes(field)) result.push(field);
+
+    field = getMapFieldOfPoint(building.x + widthHalf, building.y - lengthHalf, fieldsMap);
+    if (!result.includes(field)) result.push(field);
+
+    field = getMapFieldOfPoint(building.x + widthHalf, building.y + lengthHalf, fieldsMap);
+    if (!result.includes(field)) result.push(field);
+
+    return result;
+};
+
+export const getMapFieldsOfUnit = <T>(unit: Unit, fieldsMap: T[][]): T[] => {
+    const widthHalf = unit.width / 2;
+    const lengthHalf = unit.length / 2;
+
+    let result: T[] = [];
+    result.push(getMapFieldOfPoint(unit.x - widthHalf, unit.y + lengthHalf, fieldsMap));
+
+    let field = getMapFieldOfPoint(unit.x - widthHalf, unit.y - lengthHalf, fieldsMap);
+    if (!result.includes(field)) result.push(field);
+
+    field = getMapFieldOfPoint(unit.x + widthHalf, unit.y - lengthHalf, fieldsMap);
+    if (!result.includes(field)) result.push(field);
+
+    field = getMapFieldOfPoint(unit.x + widthHalf, unit.y + lengthHalf, fieldsMap);
+    if (!result.includes(field)) result.push(field);
+
+    return result;
 };
 
 /**
@@ -27,9 +81,8 @@ export const getMapFieldOfPosition = (x: number, y: number, fieldsMap: MapField[
  */
 export const getCrossedMapFieldsForLine = (
     startPoint: Point2d,
-    endPoint: Point2d,
-    fieldsMap: MapField[][]
-): { mapFields: MapField[]; crossings: Point2d[]; } => {
+    endPoint: Point2d
+): { mapPositions: MapPosition[]; crossings: Point2d[]; } => {
 
     if (startPoint.x == endPoint.x) {
         // if line is perfectly vertical
@@ -38,17 +91,16 @@ export const getCrossedMapFieldsForLine = (
             endPoint
         );
         let isAscending = (endPoint.y - startPoint.y) > 0;
-        let firstMapField = getMapFieldOfPosition(startPoint.x, startPoint.y, fieldsMap);
+        let firstMapField = getMapPositionOfPoint(startPoint.x, startPoint.y);
 
-        let mapFields = getCrossedMapFieldsForLineByY(
+        let mapPositions = getCrossedMapFieldsForLineByY(
             horizontalCrossings,
             isAscending,
-            firstMapField,
-            fieldsMap
+            firstMapField
         );
 
         return {
-            mapFields,
+            mapPositions,
             crossings: horizontalCrossings
         };
     } else {
@@ -63,21 +115,88 @@ export const getCrossedMapFieldsForLine = (
         );
 
         let isAscending = (endPoint.x - startPoint.x) > 0;
-        let firstMapField = getMapFieldOfPosition(
-            startPoint.x,
-            startPoint.y,
-            fieldsMap
-        );
+
+        let firstMapPosition = getMapPositionOfPoint(startPoint.x, startPoint.y);
 
         return getCrossedMapFieldsForLineByX(
             verticalCrossings,
             horizontalCrossings,
             isAscending,
-            firstMapField,
-            fieldsMap
+            firstMapPosition
         );
     }
 };
+
+/**
+ * Changes unit's position according to time elapsed.
+ * @param unit Moved unit.
+ * @param deltaTime Time elapsed from last movement of unit.
+ * @param movement Movement data.
+ * @returns The time [s] elapsed from reaching the end, otherwise 0.
+ */
+export const moveUnitByDeltaTime = (movement: Movement, deltaTime: number): number => {
+    // current timestamp maybe should be given...
+    let lastPoint = new Point2d(movement.unit.x, movement.unit.y);
+    let nextPoint = movement.path.points[movement.nextPointIndex];
+    let remainingTime = deltaTime;
+    movement.lastTimestamp = Date.now();
+
+    while (remainingTime > 0) {
+        console.log("path: ", movement.path);
+
+        console.log("lastPoint: ", lastPoint);
+        console.log("nextPoint: ", nextPoint);
+
+        let v = new Vector2d(
+            nextPoint.x - lastPoint.x,
+            nextPoint.y - lastPoint.y
+        );
+
+        let sToReachNext = v.getLength();
+        let vOnMapField = movement.unit.getVelocityOnMapField(movement.path.mapFields[movement.nextPointIndex]);
+        let tToReachNext = sToReachNext / vOnMapField;
+
+        remainingTime -= tToReachNext;
+
+        if (remainingTime <= 0) {
+            console.log("<=0");
+            let lackingDistance = -remainingTime * vOnMapField; //remainingTime is negative
+            let distanceFromLastIntersection = sToReachNext - lackingDistance;
+
+            let unitPosition = lastPoint.copy().moveAlongVectorByLength(v, distanceFromLastIntersection);
+            movement.unit.x = unitPosition.x;
+            movement.unit.y = unitPosition.y;
+            // movement.unit.occupiedFields.length = 0;
+            // movement.unit.occupiedFields.push(...getMapFieldsOfUnit(movement.unit, fieldsMap));
+            console.log("unit: (", movement.unit.x, ", ", movement.unit.y, ")");
+            if (remainingTime == 0) {
+                movement.nextPointIndex++;
+                if (movement.nextPointIndex == movement.path.points.length) {
+                    return 0;
+                }
+            }
+            return 0;
+        } else if (movement.nextPointIndex == movement.path.points.length - 1) {
+            //if remainingTime > 0
+            console.log("> 0 path finished");
+
+            let endPoint = movement.path.points[movement.path.points.length - 1];
+            movement.unit.x = endPoint.x;
+            movement.unit.y = endPoint.y;
+            // movement.unit.occupiedFields.length = 0;
+            // movement.unit.occupiedFields.push(...getMapFieldsOfUnit(movement.unit, fieldsMap));
+            return remainingTime;
+        } else {
+            // continue executing loop
+            console.log(">0 continuing");
+            movement.nextPointIndex++;
+            lastPoint = nextPoint;
+            nextPoint = movement.path.points[movement.nextPointIndex + 1];
+        }
+    }
+    throw new Error("This place should never be reached. The method 'moveUnitByDeltaTime' contains mistatkes.");
+};
+
 
 /**
  * Gets array of {@link MapField}s which are crossed, by the first
@@ -91,7 +210,7 @@ export const getCrossedMapFieldsForLine = (
  * when crossing in vertical direction (to the field above or underneath).
  * @param isAscending Information, if the line leads in right direction (x
  * coordinate of consecutive points rises), otherwise should be false.
- * @param firstMapField {@link MapField} of start point of the line.
+ * @param firstMapPostion {@link MapField} of start point of the line.
  * @param fieldsMap Two-dimentionsl array of {@link MapField}s.
  * @returns Object containing list of {@link MapField}s and merged array of
  * crossings of line between the {@link MapField}s in order of crossing them.
@@ -100,20 +219,19 @@ const getCrossedMapFieldsForLineByX = (
     verticalCrossings: Point2d[],
     horizontalCrossings: Point2d[],
     isAscending: boolean,
-    firstMapField: MapField,
-    fieldsMap: MapField[][]
+    firstMapPostion: MapPosition
 ): {
-    mapFields: MapField[],
+    mapPositions: MapPosition[],
     crossings: Point2d[];
 } => {
     //DEV current solution of empty intersections table problem is probably nonoptimal
     //OPT
     let verticalIndex = verticalCrossings.length == 0 ? -1 : 0;
     let horizontalIndex = horizontalCrossings.length == 0 ? -1 : 0;
-    let mapFieldsToReturn: MapField[] = [firstMapField];
+    let mapPositionsToReturn: MapPosition[] = [firstMapPostion];
     let crossingsToReturn: Point2d[] = [];
 
-    let lastField = firstMapField;
+    let lastMapPosition = firstMapPostion;
     let lengthsSum = verticalCrossings.length + horizontalCrossings.length;
     let shift: number;
     if (isAscending)
@@ -126,56 +244,65 @@ const getCrossedMapFieldsForLineByX = (
         const horizPoint = horizontalIndex < 0 ? new Point2d(Infinity, 0) : horizontalCrossings[horizontalIndex];
         if (vertPoint.x < horizPoint.x) {
             verticalIndex++;
-            let nextField = fieldsMap[lastField.column + shift][lastField.row];
-            mapFieldsToReturn.push(nextField);
+            let nextMapPosition = {
+                column: lastMapPosition.column + shift,
+                row: lastMapPosition.row
+            };
+            mapPositionsToReturn.push(nextMapPosition);
             crossingsToReturn.push(vertPoint);
-            lastField = nextField;
+            lastMapPosition = nextMapPosition;
         } else if (vertPoint.x > horizPoint.x) {
             horizontalIndex++;
-            let nextField = fieldsMap[lastField.column][lastField.row + shift];
-            mapFieldsToReturn.push(nextField);
-            lastField = nextField;
+            let nextMapPosition = {
+                column: lastMapPosition.column,
+                row: lastMapPosition.row + shift
+            };
+            mapPositionsToReturn.push(nextMapPosition);
+            lastMapPosition = nextMapPosition;
             crossingsToReturn.push(horizPoint);
         }
+        //cannot be equal
     }
     return {
-        mapFields: mapFieldsToReturn,
+        mapPositions: mapPositionsToReturn,
         crossings: crossingsToReturn
     };
 };
 
 /**
- * Gets array of {@link MapField}s which are crossed, by the first
+ * Gets array of {@link MapPosition}s which are crossed, by the first
  * {@link MapField} and intersections between MapFields. Can be used only for
  * lines, which cross {@link MapField}s in vertical direction.
  * @param horizontalCrossings Crossings between {@link MapField}s (but only
  * in vertical direction).
  * @param isAscending Information, if the line leads in upper direction (y
  * coordinate of consecutive points rises), otherwise should be false.
- * @param firstMapField {@link MapField} of the start of the line.
+ * @param firstMapPosition {@link MapField} of the start of the line.
  * @param fieldsMap Two-dimentionsl array of {@link MapField}s.
- * @returns List of {@link MapField}s in order of crossing them.
+ * @returns List of {@link MapPosition}s in order of crossing them.
  */
 const getCrossedMapFieldsForLineByY = (
     horizontalCrossings: Point2d[],
     isAscending: boolean,
-    firstMapField: MapField,
-    fieldsMap: MapField[][]
+    firstMapPosition: MapPosition
 ) => {
-    let mapFieldsToReturn: MapField[] = [firstMapField];
+    let mapPositionsToReturn: MapPosition[] = [firstMapPosition];
 
-    let lastField = firstMapField;
+    let lastMapPosition = firstMapPosition;
     let shift: number;
     if (isAscending)
         shift = +1;
     else shift = -1;
 
     for (let i = 0; i < horizontalCrossings.length; i++) {
-        let nextField = fieldsMap[lastField.column][lastField.row + shift];
-        mapFieldsToReturn.push(nextField);
-        lastField = nextField;
+        let nextMapPosition = {
+            column: lastMapPosition.column,
+            row: lastMapPosition.row + shift
+        };
+        mapPositionsToReturn.push(nextMapPosition);
+        lastMapPosition = nextMapPosition;
     }
-    return mapFieldsToReturn;
+    return mapPositionsToReturn;
 };
 
 /**
@@ -258,6 +385,15 @@ const getCrossingsWithHorizontalMapBorders = (startPoint: Point2d, endPoint: Poi
         );
     }
     return intersectionPoints;
+};
+
+/**
+ * Map position of point i.e. column and row of {@link MapField} the
+ * point is located on.
+ */
+export type MapPosition = {
+    column: number;
+    row: number;
 };
 
 /**Helper function in e.g. {@link getIntersectionsWithVerticalMapBorders} */
