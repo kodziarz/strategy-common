@@ -39,4 +39,13 @@ export default class Path {
             this.points = [];
         }
     }
+
+    /**
+     * Only for debug purposses - rather useless in any other application
+     */
+    getWithIdentifiers() {
+        let copy: any = { ...this };
+        copy.mapFields = this.mapFields.map((field) => field.getIndentifier());
+        return copy;
+    }
 }
